@@ -1,6 +1,18 @@
 .data
 		gameBoard: .space 42 # init the gameBoard with the size of 6x7 = 42 bits
 		msg_welcome: .asciiz "Welcome to Four-in-a-row"
+		msg_welcome_0: .asciiz "\n\n\n---------------------------------------------------------------------------------------\n\n\n"
+	    	msg_welcome_1: .asciiz "\n*****   ***   *   *  ****      *   **    *          *         ****    ***   *         *"
+		msg_welcome_2: .asciiz "\n*      *   *  *   *  *   *     *   * *   *         * *        *   *  *   *  *         *"
+		msg_welcome_3: .asciiz "\n*****  *   *  *   *  ****      *   *  *  *        *   *       ****   *   *   *   *   * " 
+		msg_welcome_4: .asciiz "\n*      *   *  *   *  *  *      *   *   * *       *******      *  *   *   *    * * * *  "
+		msg_welcome_5: .asciiz "\n*       ***   *****  *   *     *   *    **      *       *     *   *   ***      *   *   "
+		msg_rule_ask: .asciiz "\nDo you want to read the game rules? If yes, please type 1, else type 0 to start the game!"
+		msg_rule_1: .asciiz "\n\n1) Initially, the starting player will be randomly chosen. This player can pick either X or O as their token, \nand the other player will have to stick with the remaining one."
+		msg_rule_2: .asciiz "\n\n2) The gameboard will be a 6x7 matrix. In each round, a player will choose a column by its index (from 1 to 7), \nthen drop a token in that column. The token will fall straight down, and will either occupy the lowest available \nspot within the column or be stopped by an another token."
+		msg_rule_3: .asciiz "\n\n3) Each player takes turn alternately. The first one connecting four same tokens vertically, horizontally or \ndiagonally will be declared as the winner. If the board is full and no player has already connect four pieces, \nthe game ends in a draw."
+		msg_rule_4: .asciiz "\n\n4) Each player has 3 chances of undo their previous move right before the other player's turn, and can undo \nat most once each round. In addition, at the start of the game, the violation count of both players will be \nset to three. If a player try to place a token in an inappropriate column (such as a full column or out of \nrange column), their violation count will be decreased by one. Upon reaching zero violation count, that player \nwill lose the game, and the other player will be the winner."
+		msg_rule_5: .asciiz "\n\nThis is the end of \"four in a row\" rule. Please type 1 to start the game."
 		msg_player1_first: .asciiz "\nPlayer 1 will go first. Please choose X (type 1) or O (type 0): "
 		msg_player2_first: .asciiz "\nPlayer 2 will go first. Please choose X (type 1) or O (type 0): "
 		msg_player1_token_X: .asciiz "\nPlayer 1 chose X. Player 2 will go with O."
@@ -50,9 +62,52 @@ main:
 ##############################################################################
 
 welcome: # Print welcome message
-		la	$a0, msg_welcome
+		la	$a0, msg_welcome_0
 		li 	$v0, 4
 		syscall
+		la	$a0, msg_welcome_1
+		li 	$v0, 4
+		syscall
+		la	$a0, msg_welcome_2
+		li 	$v0, 4
+		syscall
+		la	$a0, msg_welcome_3
+		li 	$v0, 4
+		syscall
+		la	$a0, msg_welcome_4
+		li 	$v0, 4
+		syscall
+		la	$a0, msg_welcome_5
+		li 	$v0, 4
+		syscall
+		la	$a0, msg_welcome_0
+		li 	$v0, 4
+		syscall
+		
+		la	$a0, msg_rule_ask
+		li 	$v0, 4
+		syscall
+		li	$v0, 5
+		syscall 
+		move 	$t0, $v0 # temporarily save the player's choice
+		beq	$t0, 0, exitWelcome
+		
+		la	$a0, msg_rule_1
+		li 	$v0, 4
+		syscall
+		la	$a0, msg_rule_2
+		li 	$v0, 4
+		syscall
+		la	$a0, msg_rule_3
+		li 	$v0, 4
+		syscall
+		la	$a0, msg_rule_4
+		li 	$v0, 4
+		syscall
+		la	$a0, msg_rule_5
+		li 	$v0, 4
+		syscall	
+exitWelcome:
 		jr 	$ra
 
 ##############################################################################

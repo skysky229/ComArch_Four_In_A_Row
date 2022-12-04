@@ -7,12 +7,12 @@
 		msg_welcome_3: .asciiz "\n*****  *   *  *   *  ****      *   *  *  *        *   *       ****   *   *   *   *   * " 
 		msg_welcome_4: .asciiz "\n*      *   *  *   *  *  *      *   *   * *       *******      *  *   *   *    * * * *  "
 		msg_welcome_5: .asciiz "\n*       ***   *****  *   *     *   *    **      *       *     *   *   ***      *   *   "
-		msg_rule_ask: .asciiz "\nDo you want to read the game rules? If yes, please type 1, else type 0 to start the game: "
+		msg_rule_ask: .asciiz "\nDo you want to read the game rules? If yes, please type 1, else type 0 to start the game!"
 		msg_rule_1: .asciiz "\n\n1) Initially, the starting player will be randomly chosen. This player can pick either X or O as their token, \nand the other player will have to stick with the remaining one."
 		msg_rule_2: .asciiz "\n\n2) The gameboard will be a 6x7 matrix. In each round, a player will choose a column by its index (from 1 to 7), \nthen drop a token in that column. The token will fall straight down, and will either occupy the lowest available \nspot within the column or be stopped by an another token."
 		msg_rule_3: .asciiz "\n\n3) Each player takes turn alternately. The first one connecting four same tokens vertically, horizontally or \ndiagonally will be declared as the winner. If the board is full and no player has already connect four pieces, \nthe game ends in a draw."
 		msg_rule_4: .asciiz "\n\n4) Each player has 3 chances of undo their previous move right before the other player's turn, and can undo \nat most once each round. In addition, at the start of the game, the violation count of both players will be \nset to three. If a player try to place a token in an inappropriate column (such as a full column or out of \nrange column), their violation count will be decreased by one. Upon reaching zero violation count, that player \nwill lose the game, and the other player will be the winner."
-		msg_rule_5: .asciiz "\n\nThis is the end of \"four in a row\" rule. Please type 1 to start the game: "
+		msg_rule_5: .asciiz "\n\nThis is the end of \"four in a row\" rule. Please type 1 to start the game."
 		msg_player1_first: .asciiz "\nPlayer 1 will go first. Please choose X (type 1) or O (type 0): "
 		msg_player2_first: .asciiz "\nPlayer 2 will go first. Please choose X (type 1) or O (type 0): "
 		msg_player1_token_X: .asciiz "\nPlayer 1 chose X. Player 2 will go with O."
@@ -22,6 +22,7 @@
 		invalid_token: .asciiz "\nInvalid token. Please choose X (type 1) or O (type 0):"
 		msg_empty_board: .asciiz "\nCannot undo since the board is empty."
 		msg_already_undo: .asciiz "\nCannot undo since the player already undid in this round."
+		
 		msg_player1_turn: .asciiz "\nPlayer 1 turn. If player 2 wants to undo your previous move, please type 8, else please choose the column you want to drop token into (1-7): "
 		msg_player2_turn: .asciiz "\nPlayer 2 turn. If player 1 wants to undo your previous move, please type 8, else please choose the column you want to drop token into (1-7): "
 		msg_player1_choice: .asciiz "\nPlayer 1 chose column "
@@ -30,19 +31,16 @@
 		msg_player2_violate: .asciiz "\nPlayer 2 violated the rule. Violation count remain: "
 		msg_player1_eliminate: .asciiz "\nPlayer 1 violated the rule 3 times. Therefore, player 1 lost the game."
 		msg_player2_eliminate: .asciiz "\nPlayer 2 violated the rule 3 times. Therefore, player 2 lost the game."
-		msg_player1_undo: .asciiz "\nPlayer 1 undid. The remaining undo count is: "
-		msg_player2_undo: .asciiz "\nPlayer 2 undid. The remaining undo count is: "
+		msg_player1_undo: .asciiz "\nPlayer 1 undoed. The remaining undo count is: "
+		msg_player2_undo: .asciiz "\nPlayer 2 undoed. The remaining undo count is: "
 		msg_player1_undo_failed: .asciiz "\nPlayer 1 is out of undo chance."
 		msg_player2_undo_failed: .asciiz "\nPlayer 2 is out of undo chance."
-		msg_winner: .asciiz "\nCongratulation!!! The winner is player "
-		msg_draw: .asciiz "\nThe game board is full. Draw!!!"
+		msg_winner: .asciiz "\nThe winner is player "
+		msg_draw: .asciiz "\nDraw"
 		dot: .asciiz "."
 		X_token: .asciiz "X"
 		O_token: .asciiz "O"
 		endLine: .asciiz "\n"
-		columnId: .asciiz      "\n| 1 | 2 | 3 | 4 | 5 | 6 | 7 |"
-		lineSeparator: .asciiz "\n+---+---+---+---+---+---+---+\n"
-		tokenSeparator: .asciiz "|"
 		gap: .asciiz " "
 
 .text 
@@ -85,15 +83,14 @@ welcome: # Print welcome message
 		la	$a0, msg_welcome_0
 		li 	$v0, 4
 		syscall
+		
 		la	$a0, msg_rule_ask
 		li 	$v0, 4
 		syscall
-		
 		li	$v0, 5
 		syscall 
 		move 	$t0, $v0 # temporarily save the player's choice
 		beq	$t0, 0, exitWelcome
-		
 printRules:
 		la	$a0, msg_rule_1
 		li 	$v0, 4
@@ -112,7 +109,6 @@ printRules:
 		syscall	
 		li	$v0, 5
 		syscall 
-		
 exitWelcome:
 		jr 	$ra
 
@@ -244,38 +240,14 @@ print:
 		la	$a0, endLine # print End Line
 		li	$v0, 4
 		syscall	
-		
-		la	$a0, columnId # print columnId
-		li	$v0, 4
-		syscall	
-		
-		la	$a0, lineSeparator # print line separator
-		li	$v0, 4
-		syscall	
-		
-		la	$a0, tokenSeparator # print token separator at the start of the first line 
-		li	$v0, 4
-		syscall	
-		
-		la 	$a0, gap # print space at the start of the first line
-		li 	$v0, 4
-		syscall
 
 		li 	$t0, 0	# setup overall counter
 		la	$t1, gameBoard # t1 as the pointer to the start of gameBoard
 		li 	$t3, 0	# setup counter for the number of element in a row
 loopPrint:	
-		lb 	$a0, 0($t1) # print a[i][j] to a0
+		lb 	$a0, 0($t1) # load a[i][j] to a0 for printing
 		li 	$v0, 11
 		syscall
-		
-		la 	$a0, gap # print space
-		li 	$v0, 4
-		syscall
-		
-		la	$a0, tokenSeparator # print token separator
-		li	$v0, 4
-		syscall	
 		
 		la 	$a0, gap # print space
 		li 	$v0, 4
@@ -287,21 +259,10 @@ loopPrint:
 		
 		slti	$t2, $t3, 7  # check if the number of elements on a row is 7
 		beq 	$t2, 1, checkCount # if no, move to checkCount 
-		li	$t3, 0 # if yes, reset to 0, print line separator
-		la	$a0, lineSeparator # print line separator
+		li	$t3, 0 # if yes, reset to 0, print endLine
+		la	$a0, endLine # print End Line
 		li	$v0, 4
 		syscall	
-		
-		slti	$t2, $t0, 42 # check if it reaches the end of the board
-		beq 	$t2, 0, checkCount # if it reaches the end of the board, then dont print the first token separator and gap for the next line
-		
-		la	$a0, tokenSeparator # print token separator at the start of the next line 
-		li	$v0, 4
-		syscall	
-		
-		la 	$a0, gap # print space at the start of the next line
-		li 	$v0, 4
-		syscall
 		
 checkCount:	
 		slti	$t2, $t0, 42 # check if traversed over all the gameBoard yet
@@ -388,7 +349,7 @@ player1_add:
 ##############################################################################
 
 pushToken: 	# push the previously added token to the stack
-		lw	$t6, 0($sp) # store the return address of previous func to t6
+		lw	$t6, 0($sp) # store the return address of previous func to t5
 		lw	$t7, 4($sp) # store the added Token's column index of the previous round 
 		addi 	$sp, $sp, 8	
 		
@@ -526,13 +487,16 @@ gameLoop:
 		jal 	print # print the gameBoard
 		jal 	CheckWinCondition # check if any player wins. If there is a winner, the program will automatically declare the winner 
 		move	$ra, $s5 # return the return address		
-		bne 	$a1, 0, endGameFunc # if there is a winner jump to winNoti 
+		bne 	$a1, 0, endGameFunc # if there is a winner or a draw, jump to winNoti 
 		beq 	$s3, 1, setToTwo # if currently it is player one turn, set to player 2's turn
 setToOne:	li 	$s3, 1 # else set to player 1's turn
 		j 	EndSet
 setToTwo:	li	$s3, 2
 EndSet:		# the end of set condition
 		addi  	$s4, $s4, 1 # increase round counter
+		move 	$a0, $s4
+		li	$v0, 1
+		syscall
 		slti	$t2, $s4, 42 # if the number of round is smaller than 42
 		beq	$t2, 1, gameLoop # loop again
 		
